@@ -49,6 +49,7 @@ class _LoginComponentState extends State<LoginComponent> {
                     child: Text(_message),
                   ),
                   TextFormField(
+                    autocorrect: false,
                     controller: _emailLoginTextController,
                     focusNode: _emailLoginFocusNode,
                     validator: (value) => Validator.validateEmail(
@@ -57,6 +58,8 @@ class _LoginComponentState extends State<LoginComponent> {
                     decoration: InputDecoration(labelText: "Email Address"),
                   ),
                   TextFormField(
+                    autocorrect: false,
+                    obscureText: true,
                     controller: _passwordLoginTextController1,
                     focusNode: _passwordLoginFocusNode1,
                     validator: (value) => Validator.validatePassword(
@@ -87,11 +90,9 @@ class _LoginComponentState extends State<LoginComponent> {
                                 password: _passwordLoginTextController1.text,
                               ).whenComplete(() => _isProcessing = false);
                               if (user != null) {
-                                Navigator.of(context)
-                                    .pushReplacement(MaterialPageRoute(
-                                        builder: (context) => HomeComponent(
-                                              user: user,
-                                            )));
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) => HomeComponent()));
                               }
                             }
                           },

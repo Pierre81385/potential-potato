@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:potential_potato/AdminComponents/Employees.dart';
+import 'package:potential_potato/AdminComponents/create_employees.dart';
 import 'package:potential_potato/AuthComponents/login.dart';
 import '../authComponents/image.dart';
 import 'auth.dart';
@@ -19,6 +19,7 @@ class _RegisterComponentState extends State<RegisterComponent> {
   final _nameRegisterFocusNode = FocusNode();
   final _emailRegisterTextController = TextEditingController();
   final _emailRegisterFocusNode = FocusNode();
+
   final _passwordRegisterTextController1 = TextEditingController();
   final _passwordRegisterFocusNode1 = FocusNode();
   final _passwordRegisterTextController2 = TextEditingController();
@@ -52,6 +53,7 @@ class _RegisterComponentState extends State<RegisterComponent> {
                     },
                   ),
                   TextFormField(
+                    autocorrect: false,
                     controller: _nameRegisterTextController,
                     focusNode: _nameRegisterFocusNode,
                     validator: (value) => Validator.validateName(
@@ -60,6 +62,7 @@ class _RegisterComponentState extends State<RegisterComponent> {
                     decoration: InputDecoration(labelText: "Username"),
                   ),
                   TextFormField(
+                    autocorrect: false,
                     controller: _emailRegisterTextController,
                     focusNode: _emailRegisterFocusNode,
                     validator: (value) => Validator.validateEmail(
@@ -68,6 +71,8 @@ class _RegisterComponentState extends State<RegisterComponent> {
                     decoration: InputDecoration(labelText: "Email Address"),
                   ),
                   TextFormField(
+                    autocorrect: false,
+                    obscureText: true,
                     controller: _passwordRegisterTextController1,
                     focusNode: _passwordRegisterFocusNode1,
                     validator: (value) => Validator.validatePassword(
@@ -76,6 +81,8 @@ class _RegisterComponentState extends State<RegisterComponent> {
                     decoration: InputDecoration(labelText: "Password"),
                   ),
                   TextFormField(
+                    autocorrect: false,
+                    obscureText: true,
                     controller: _passwordRegisterTextController2,
                     focusNode: _passwordRegisterFocusNode2,
                     validator: (value) => Validator.validatePassword(
@@ -99,7 +106,6 @@ class _RegisterComponentState extends State<RegisterComponent> {
                             _emailRegisterFocusNode.unfocus();
                             _passwordRegisterFocusNode1.unfocus();
                             _passwordRegisterFocusNode2.unfocus();
-
                             if (_registerFormKey.currentState!.validate()) {
                               setState(() {
                                 _isProcessing = true;
@@ -112,9 +118,10 @@ class _RegisterComponentState extends State<RegisterComponent> {
                                 password: _passwordRegisterTextController2.text,
                               ).whenComplete(() => _isProcessing = false);
                               if (user != null) {
-                                Navigator.of(context)
-                                    .pushReplacement(MaterialPageRoute(
-                                        builder: (context) => EmployeeComponent(
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            CreateEmployeeComponent(
                                               user: user,
                                             )));
                               }

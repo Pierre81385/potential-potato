@@ -2,38 +2,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../AuthComponents/login.dart';
-import '../Models/employee_model.dart';
+//import '../Models/employee_model.dart';
 
-class EmployeeComponent extends StatefulWidget {
-  const EmployeeComponent({super.key, required this.user});
+class CreateEmployeeComponent extends StatefulWidget {
+  const CreateEmployeeComponent({super.key, required this.user});
   final User user;
 
   @override
-  State<EmployeeComponent> createState() => _EmployeeComponentState();
+  State<CreateEmployeeComponent> createState() =>
+      _CreateEmployeeComponentState();
 }
 
-class _EmployeeComponentState extends State<EmployeeComponent> {
+class _CreateEmployeeComponentState extends State<CreateEmployeeComponent> {
   late User _currentUser;
 
-  List<String> _employeeRole = [
-    "owner",
-    "generalManager",
-    "bohManager",
-    "fohManager",
-    "barManager",
-    "bartender",
-    "barBack",
-    "server",
-    "foodRunner",
-    "headChef",
-    "chef",
-    "prepCook",
-    "dishwasher",
-    "bohTraining",
-    "fohTraining",
+  final List<String> _employeeRole = [
+    "Owner",
+    "General Manager",
+    "BOH Manager",
+    "FOH Manager",
+    "Bar Manager",
+    "Bartender",
+    "Barback",
+    "Server",
+    "Food Runner",
+    "Head Chef",
+    "Chef",
+    "Prep COok",
+    "Dish",
+    "Training",
     "none"
   ];
-  String selectedRole = EmployeeRole[15]; // Initially selected role
+  String selectedRole = "none";
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -42,17 +43,14 @@ class _EmployeeComponentState extends State<EmployeeComponent> {
   }
 
   Future<void> addUserToEmployeesCollection(role, User user) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    print("addUserToEmployeesCollection called");
     try {
-      await firestore.collection('Employees').add({
+      await firestore.collection('Employees').doc(user.uid).set({
         'employeeId': user.uid,
         'name': user.displayName,
         'email': user.email,
         'phoneNumber': user.phoneNumber,
         'role': role,
       }).whenComplete(() {
-        print("employee added!");
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => LoginComponent(
                   message: "Success! ${user.displayName}, please login.",
@@ -97,7 +95,6 @@ class _EmployeeComponentState extends State<EmployeeComponent> {
               ),
               OutlinedButton(
                   onPressed: () {
-                    print("confirm button pressed");
                     addUserToEmployeesCollection(selectedRole, _currentUser);
                   },
                   child: Text("Confirm"))
