@@ -30,13 +30,22 @@ class _HomeComponentState extends State<HomeComponent> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("HOME"),
-            Text(_currentUser.uid),
+            Text("Ok, You've now logged in via Firebase Auth!"),
+            Text(_currentUser.toString()),
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => LoginComponent(
+                            message: "",
+                          )));
+                },
+                child: Text("Next")),
             OutlinedButton(
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut().whenComplete(() =>
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => LoginComponent())));
+                          builder: (context) =>
+                              LoginComponent(message: "Goodbye!"))));
                 },
                 child: Text("Logout")),
           ],

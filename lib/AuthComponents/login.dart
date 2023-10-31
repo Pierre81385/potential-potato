@@ -6,7 +6,8 @@ import 'auth.dart';
 import 'validate.dart';
 
 class LoginComponent extends StatefulWidget {
-  const LoginComponent({super.key});
+  const LoginComponent({super.key, required this.message});
+  final String message;
 
   @override
   State<LoginComponent> createState() => _LoginComponentState();
@@ -19,6 +20,13 @@ class _LoginComponentState extends State<LoginComponent> {
   final _passwordLoginTextController1 = TextEditingController();
   final _passwordLoginFocusNode1 = FocusNode();
   bool _isProcessing = false;
+  String _message = "";
+
+  @override
+  void initState() {
+    _message = widget.message;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +44,10 @@ class _LoginComponentState extends State<LoginComponent> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(_message),
+                  ),
                   TextFormField(
                     controller: _emailLoginTextController,
                     focusNode: _emailLoginFocusNode,

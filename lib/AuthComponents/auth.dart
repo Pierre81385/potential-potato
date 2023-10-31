@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class FireAuth {
   // For registering a new user
   static Future<User?> registerUsingEmailPassword({
+    required String image,
     required String name,
     required String email,
     required String password,
@@ -17,8 +19,9 @@ class FireAuth {
       );
 
       user = userCredential.user;
-      await user!.updateProfile(displayName: name);
-      await user.reload();
+      await user!.updateDisplayName(name);
+      await user!.updatePhotoURL(image);
+      await user!.reload();
       user = auth.currentUser;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -49,9 +52,18 @@ class FireAuth {
       user = userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
+        AlertDialog(
+            title: Text("USER NOT FOUND"),
+            content: Text('No user found for that email.'));
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided.');
+        AlertDialog(
+            title: Text("PASSWORD INCORRECT"),
+            content: Text('THe password you entered is incorrect.'));
+      } else {
+        AlertDialog(
+          title: Text("ERROR"),
+          content: Text(e.toString()),
+        );
       }
     }
 

@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:potential_potato/AdminComponents/Employees.dart';
 import 'package:potential_potato/AuthComponents/login.dart';
-import 'package:potential_potato/home.dart';
+import '../authComponents/image.dart';
 import 'auth.dart';
 import 'validate.dart';
 
@@ -22,6 +23,7 @@ class _RegisterComponentState extends State<RegisterComponent> {
   final _passwordRegisterFocusNode1 = FocusNode();
   final _passwordRegisterTextController2 = TextEditingController();
   final _passwordRegisterFocusNode2 = FocusNode();
+  String _avatarPhoto = 'upload photo';
   bool _isProcessing = false;
 
   @override
@@ -42,6 +44,13 @@ class _RegisterComponentState extends State<RegisterComponent> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  AvatarUploads(
+                    onSelect: (value) {
+                      setState(() {
+                        _avatarPhoto = value!;
+                      });
+                    },
+                  ),
                   TextFormField(
                     controller: _nameRegisterTextController,
                     focusNode: _nameRegisterFocusNode,
@@ -77,7 +86,9 @@ class _RegisterComponentState extends State<RegisterComponent> {
                   OutlinedButton(
                       onPressed: () {
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => LoginComponent()));
+                            builder: (context) => LoginComponent(
+                                  message: "",
+                                )));
                       },
                       child: Text("Back")),
                   _isProcessing
@@ -95,15 +106,17 @@ class _RegisterComponentState extends State<RegisterComponent> {
                               });
                               User? user =
                                   await FireAuth.registerUsingEmailPassword(
+                                image: _avatarPhoto,
                                 name: _nameRegisterTextController.text,
                                 email: _emailRegisterTextController.text,
                                 password: _passwordRegisterTextController2.text,
                               ).whenComplete(() => _isProcessing = false);
                               if (user != null) {
-                                Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            LoginComponent()));
+                                Navigator.of(context)
+                                    .pushReplacement(MaterialPageRoute(
+                                        builder: (context) => EmployeeComponent(
+                                              user: user,
+                                            )));
                               }
                             }
                           },
