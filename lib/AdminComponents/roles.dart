@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:potential_potato/home.dart';
 
 class RoleComponent extends StatefulWidget {
   const RoleComponent({super.key});
@@ -13,9 +14,9 @@ class _RoleComponentState extends State<RoleComponent> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   late Stream<QuerySnapshot> _allRoles;
   String _showEdit = "";
-  final _nameUpdateTextController = TextEditingController();
+  TextEditingController _nameUpdateTextController = TextEditingController();
   final _nameUpdateFocusNode = FocusNode();
-  final _lvlUpdateTextController = TextEditingController();
+  TextEditingController _lvlUpdateTextController = TextEditingController();
   final _lvlUpdateFocusNode = FocusNode();
   final _nameTextController = TextEditingController();
   final _nameFocusNode = FocusNode();
@@ -84,30 +85,42 @@ class _RoleComponentState extends State<RoleComponent> {
             return Column(
               children: [
                 Form(
-                    child: ListTile(
-                  title: TextFormField(
-                    autocorrect: false,
-                    controller: _nameTextController,
-                    focusNode: _nameFocusNode,
-                    decoration: InputDecoration(labelText: "Role Name"),
+                  child: ListTile(
+                    title: TextFormField(
+                      autocorrect: false,
+                      controller: _nameTextController,
+                      focusNode: _nameFocusNode,
+                      decoration: InputDecoration(labelText: "Role Name"),
+                    ),
+                    subtitle: TextFormField(
+                      autocorrect: false,
+                      controller: _lvlTextController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      focusNode: _lvlFocusNode,
+                      decoration: InputDecoration(labelText: "LVL"),
+                    ),
+                    trailing: IconButton(
+                        onPressed: () {
+                          addRole(_nameTextController.text,
+                              _lvlTextController.text);
+                          _nameTextController.text = "";
+                          _lvlTextController.text = "";
+                        },
+                        icon: Icon(Icons.add_box_rounded)),
                   ),
-                  subtitle: TextFormField(
-                    autocorrect: false,
-                    controller: _lvlTextController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    focusNode: _lvlFocusNode,
-                    decoration: InputDecoration(labelText: "LVL"),
-                  ),
-                  trailing: IconButton(
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: OutlinedButton(
                       onPressed: () {
-                        addRole(
-                            _nameTextController.text, _lvlTextController.text);
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => HomeComponent()));
                       },
-                      icon: Icon(Icons.add_box_rounded)),
-                )),
+                      child: Text("Back")),
+                ),
                 Expanded(
                   child: ListView.builder(
                     physics: const ScrollPhysics(),
@@ -121,30 +134,44 @@ class _RoleComponentState extends State<RoleComponent> {
                             _showEdit == snapshot.data?.docs[index].id
                                 ? Form(
                                     child: ListTile(
+                                    leading: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _showEdit = "";
+                                          });
+                                        },
+                                        icon: Icon(Icons.edit)),
                                     title: TextFormField(
-                                      initialValue: snapshot.data?.docs[index]
-                                          ['name'],
+                                      controller: _nameUpdateTextController,
                                       autocorrect: false,
-                                      //controller: _nameUpdateTextController,
                                       focusNode: _nameUpdateFocusNode,
+                                      decoration: InputDecoration(
+                                          hintText: snapshot.data?.docs[index]
+                                              ['name']),
                                     ),
                                     subtitle: TextFormField(
-                                      initialValue: snapshot.data?.docs[index]
-                                          ['lvl'],
+                                      controller: _lvlUpdateTextController,
                                       autocorrect: false,
-                                      //controller: _lvlUpdateTextController,
                                       keyboardType: TextInputType.number,
                                       inputFormatters: <TextInputFormatter>[
                                         FilteringTextInputFormatter.digitsOnly
                                       ],
                                       focusNode: _lvlUpdateFocusNode,
+                                      decoration: InputDecoration(
+                                          hintText: snapshot.data?.docs[index]
+                                              ['lvl']),
                                     ),
                                     trailing: IconButton(
                                         onPressed: () {
                                           updateRole(
                                               snapshot.data!.docs[index].id,
-                                              _nameTextController.text,
-                                              _lvlTextController.text);
+                                              _nameUpdateTextController.text,
+                                              _lvlUpdateTextController.text);
+                                          setState(() {
+                                            _nameUpdateTextController.text = "";
+                                            _lvlUpdateTextController.text = "";
+                                            _showEdit = "";
+                                          });
                                         },
                                         icon: Icon(Icons.add_box_rounded)),
                                   ))
