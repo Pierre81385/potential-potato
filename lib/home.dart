@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:potential_potato/AdminComponents/manage_employees.dart';
 import 'package:potential_potato/AdminComponents/manage_products.dart';
+import 'package:potential_potato/AdminComponents/roles.dart';
 import 'package:potential_potato/AuthComponents/login.dart';
 import 'package:potential_potato/BOHComponents/ticket_manager.dart';
 import 'package:potential_potato/FOHComponents/point_of_sale.dart';
@@ -52,29 +53,74 @@ class _HomeComponentState extends State<HomeComponent> {
             Text('- ${_employee.role} -'),
             Text('Welcome, ${_employee.name}!'),
             _employee.role == "Owner" || _employee.role == "General Manager"
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                ? Column(
                     children: [
-                      OutlinedButton(
-                          onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        ManageEmployeesComponent(
-                                          employee: _employee,
-                                        )));
-                          },
-                          child: Text("Employee Manager")),
-                      OutlinedButton(
-                          onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        ManageProductsComponent(
-                                          employee: _employee,
-                                        )));
-                          },
-                          child: Text("Product Manager")),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          OutlinedButton(
+                              onPressed: () {
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ManageEmployeesComponent(
+                                              employee: _employee,
+                                            )));
+                              },
+                              child: Text("Employee Manager")),
+                          OutlinedButton(
+                              onPressed: () {
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ManageProductsComponent(
+                                              employee: _employee,
+                                            )));
+                              },
+                              child: Text("Product Manager")),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          OutlinedButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushReplacement(MaterialPageRoute(
+                                        builder: (context) => POSComponent(
+                                              employee: _employee,
+                                            )));
+                              },
+                              child: Text("FOH Manager")),
+                          OutlinedButton(
+                              onPressed: () {
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            TicketManagerComponent(
+                                              employee: _employee,
+                                            )));
+                              },
+                              child: Text("BOH Manager")),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          OutlinedButton(
+                              onPressed: () {
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) => RoleComponent()));
+                              },
+                              child: Text("Role Editor")),
+                          OutlinedButton(
+                              onPressed: () {
+                                //table editor
+                              },
+                              child: Text("Table Editor")),
+                        ],
+                      ),
                     ],
                   )
                 : Row(

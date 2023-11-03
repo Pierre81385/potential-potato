@@ -2,14 +2,14 @@ import './product_model.dart';
 import './time_model.dart';
 import 'dart:convert';
 
-class Guest {
+class Check {
   final int table;
   final int seatPosition;
   final List<Product> products;
   final DateTime date;
   final TimeOfDay time;
 
-  Guest({
+  Check({
     required this.table,
     required this.seatPosition,
     required this.products,
@@ -17,8 +17,8 @@ class Guest {
     required this.time,
   });
 
-  factory Guest.fromJson(Map<String, dynamic> json) {
-    return Guest(
+  factory Check.fromJson(Map<String, dynamic> json) {
+    return Check(
       table: json['table'],
       seatPosition: json['seatPosition'],
       products: (json['products'] as List<dynamic>)

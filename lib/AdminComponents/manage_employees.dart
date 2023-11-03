@@ -26,6 +26,10 @@ class _ManageEmployeesComponentState extends State<ManageEmployeesComponent> {
           child: Column(
         children: [
           Text("Manage Employees"),
+          //list of employees
+          //sortable by name or role, searchable
+          //edit
+          //assign
           OutlinedButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(
