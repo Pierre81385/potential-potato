@@ -22,7 +22,7 @@ class _RoleComponentState extends State<RoleComponent> {
   final _lvlTextController = TextEditingController();
   final _lvlFocusNode = FocusNode();
 
-  Future<void> addRole(String _name, int _lvl) async {
+  Future<void> addRole(String _name, String _lvl) async {
     String id = firestore.collection("roles").doc().id;
     try {
       await firestore.collection("roles").doc(id).set({
@@ -34,7 +34,7 @@ class _RoleComponentState extends State<RoleComponent> {
     }
   }
 
-  Future<void> updateRole(String _id, String _name, int _lvl) async {
+  Future<void> updateRole(String _id, String _name, String _lvl) async {
     try {
       await firestore.collection("roles").doc(_id).update({
         'name': _name,
@@ -68,102 +68,116 @@ class _RoleComponentState extends State<RoleComponent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _allRoles,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return const Text('Something went wrong');
-          }
+      body: SafeArea(
+        child: StreamBuilder<QuerySnapshot>(
+          stream: _allRoles,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return const Text('Something went wrong');
+            }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text("Looking for roles!");
-          }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text("Looking for roles!");
+            }
 
-          return Column(
-            children: [
-              ListView.builder(
-                physics: const ScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: snapshot.data?.docs.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: [
-                      _showEdit == snapshot.data?.docs[index]['_id']
-                          ? Form(
-                              child: ListTile(
-                              title: TextFormField(
-                                initialValue: snapshot.data?.docs[index]
-                                    ['name'],
-                                autocorrect: false,
-                                controller: _nameUpdateTextController,
-                                focusNode: _nameUpdateFocusNode,
-                              ),
-                              subtitle: TextFormField(
-                                initialValue: snapshot.data?.docs[index]['lvl'],
-                                autocorrect: false,
-                                controller: _lvlUpdateTextController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                focusNode: _lvlUpdateFocusNode,
-                              ),
-                              trailing: IconButton(
-                                  onPressed: () {
-                                    updateRole(
-                                        snapshot.data?.docs[index]['_id'],
-                                        _nameTextController.text,
-                                        _lvlTextController.value as int);
-                                  },
-                                  icon: Icon(Icons.add_box_rounded)),
-                            ))
-                          : ListTile(
-                              leading: IconButton(
-                                  onPressed: () {}, icon: Icon(Icons.edit)),
-                              title: Text(
-                                  'Role: ${snapshot.data?.docs[index]['name']}'),
-                              subtitle: Text(
-                                  'Lvl: ${snapshot.data?.docs[index]['lvl']}'),
-                              trailing: IconButton(
-                                  onPressed: () {
-                                    deleteRole(
-                                        snapshot.data?.docs[index]['_id']);
-                                  },
-                                  icon: Icon(Icons.delete)),
-                            ),
+            return Column(
+              children: [
+                Form(
+                    child: ListTile(
+                  title: TextFormField(
+                    autocorrect: false,
+                    controller: _nameTextController,
+                    focusNode: _nameFocusNode,
+                    decoration: InputDecoration(labelText: "Role Name"),
+                  ),
+                  subtitle: TextFormField(
+                    autocorrect: false,
+                    controller: _lvlTextController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
                     ],
-                  );
-                },
-              ),
-              Form(
-                  child: ListTile(
-                title: TextFormField(
-                  autocorrect: false,
-                  controller: _nameTextController,
-                  focusNode: _nameFocusNode,
-                  decoration: InputDecoration(labelText: "Role Name"),
-                ),
-                subtitle: TextFormField(
-                  autocorrect: false,
-                  controller: _lvlTextController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  focusNode: _lvlFocusNode,
-                  decoration: InputDecoration(labelText: "LVL"),
-                ),
-                trailing: IconButton(
-                    onPressed: () {
-                      addRole(_nameTextController.text,
-                          _lvlTextController.value as int);
+                    focusNode: _lvlFocusNode,
+                    decoration: InputDecoration(labelText: "LVL"),
+                  ),
+                  trailing: IconButton(
+                      onPressed: () {
+                        addRole(
+                            _nameTextController.text, _lvlTextController.text);
+                      },
+                      icon: Icon(Icons.add_box_rounded)),
+                )),
+                Expanded(
+                  child: ListView.builder(
+                    physics: const ScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: snapshot.data?.docs.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _showEdit == snapshot.data?.docs[index].id
+                                ? Form(
+                                    child: ListTile(
+                                    title: TextFormField(
+                                      initialValue: snapshot.data?.docs[index]
+                                          ['name'],
+                                      autocorrect: false,
+                                      //controller: _nameUpdateTextController,
+                                      focusNode: _nameUpdateFocusNode,
+                                    ),
+                                    subtitle: TextFormField(
+                                      initialValue: snapshot.data?.docs[index]
+                                          ['lvl'],
+                                      autocorrect: false,
+                                      //controller: _lvlUpdateTextController,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: <TextInputFormatter>[
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      focusNode: _lvlUpdateFocusNode,
+                                    ),
+                                    trailing: IconButton(
+                                        onPressed: () {
+                                          updateRole(
+                                              snapshot.data!.docs[index].id,
+                                              _nameTextController.text,
+                                              _lvlTextController.text);
+                                        },
+                                        icon: Icon(Icons.add_box_rounded)),
+                                  ))
+                                : ListTile(
+                                    leading: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _showEdit =
+                                                snapshot.data!.docs[index].id;
+                                          });
+                                        },
+                                        icon: Icon(Icons.edit)),
+                                    title: Text(
+                                        'Role: ${snapshot.data?.docs[index]['name']}'),
+                                    subtitle: Text(
+                                        'Lvl: ${snapshot.data?.docs[index]['lvl']}'),
+                                    trailing: IconButton(
+                                        onPressed: () {
+                                          deleteRole(
+                                              snapshot.data!.docs[index].id);
+                                        },
+                                        icon: Icon(Icons.delete)),
+                                  ),
+                          ],
+                        ),
+                      );
                     },
-                    icon: Icon(Icons.add_box_rounded)),
-              ))
-            ],
-          );
-        },
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
