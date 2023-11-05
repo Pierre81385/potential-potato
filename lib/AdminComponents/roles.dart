@@ -23,7 +23,7 @@ class _RoleComponentState extends State<RoleComponent> {
   final _lvlTextController = TextEditingController();
   final _lvlFocusNode = FocusNode();
 
-  Future<void> addRole(String _name, String _lvl) async {
+  Future<void> addRole(String _name, int _lvl) async {
     String id = firestore.collection("roles").doc().id;
     try {
       await firestore.collection("roles").doc(id).set({
@@ -35,7 +35,7 @@ class _RoleComponentState extends State<RoleComponent> {
     }
   }
 
-  Future<void> updateRole(String _id, String _name, String _lvl) async {
+  Future<void> updateRole(String _id, String _name, int _lvl) async {
     try {
       await firestore.collection("roles").doc(_id).update({
         'name': _name,
@@ -105,7 +105,7 @@ class _RoleComponentState extends State<RoleComponent> {
                     trailing: IconButton(
                         onPressed: () {
                           addRole(_nameTextController.text,
-                              _lvlTextController.text);
+                              int.parse(_lvlTextController.text));
                           _nameTextController.text = "";
                           _lvlTextController.text = "";
                         },
@@ -166,7 +166,8 @@ class _RoleComponentState extends State<RoleComponent> {
                                           updateRole(
                                               snapshot.data!.docs[index].id,
                                               _nameUpdateTextController.text,
-                                              _lvlUpdateTextController.text);
+                                              int.parse(
+                                                  _lvlTextController.text));
                                           setState(() {
                                             _nameUpdateTextController.text = "";
                                             _lvlUpdateTextController.text = "";
@@ -185,7 +186,7 @@ class _RoleComponentState extends State<RoleComponent> {
                                         },
                                         icon: Icon(Icons.edit)),
                                     title: Text(
-                                        'Role: ${snapshot.data?.docs[index]['name']}'),
+                                        '${snapshot.data?.docs[index]['name']}'),
                                     subtitle: Text(
                                         'Lvl: ${snapshot.data?.docs[index]['lvl']}'),
                                     trailing: IconButton(

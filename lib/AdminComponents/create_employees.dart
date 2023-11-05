@@ -35,10 +35,14 @@ class _CreateEmployeeComponentState extends State<CreateEmployeeComponent> {
   ];
   String selectedRole = "none";
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  late Stream<QuerySnapshot> _allRoles;
 
   @override
   void initState() {
     _currentUser = widget.user;
+    _allRoles = FirebaseFirestore.instance
+        .collection('roles')
+        .snapshots(); //get all roles
     super.initState();
   }
 
@@ -79,20 +83,63 @@ class _CreateEmployeeComponentState extends State<CreateEmployeeComponent> {
               Text(_currentUser.phoneNumber != null
                   ? _currentUser.phoneNumber as String
                   : ""),
-              DropdownButton<String>(
-                value: selectedRole,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedRole = newValue!;
-                  });
-                },
-                items: _employeeRole.map((role) {
-                  return DropdownMenuItem<String>(
-                    value: role,
-                    child: Text(role), // Display role name without enum prefix
-                  );
-                }).toList(),
-              ),
+              // DropdownButton<String>(
+              //   value: selectedRole,
+              //   onChanged: (newValue) {
+              //     setState(() {
+              //       selectedRole = newValue!;
+              //     });
+              //   },
+              //   items: _employeeRole.map((role) {
+              //     return DropdownMenuItem<String>(
+              //       value: role,
+              //       child: Text(role), // Display role name without enum prefix
+              //     );
+              //   }).toList(),
+              // ),
+              StreamBuilder<QuerySnapshot>(
+                  stream: _allRoles,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text('Something went wrong');
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Text("Looking for roles!");
+                    }
+
+                    return Expanded(
+                      child: ListView.builder(
+                          physics: const ScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: snapshot.data?.docs.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return SingleChildScrollView(
+                              child: ListTile(
+                                title: Text(
+                                    '${snapshot.data?.docs[index]['name']}'),
+                                subtitle: Text(
+                                    'Lvl: ${snapshot.data?.docs[index]['lvl']}'),
+                                trailing: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedRole =
+                                            snapshot.data!.docs[index].id;
+                                      });
+                                    },
+                                    icon: Icon(Icons.check,
+                                        color: selectedRole ==
+                                                snapshot.data!.docs[index].id
+                                            ? Colors.green
+                                            : Colors.black)),
+                              ),
+                            );
+                          }),
+                    );
+                  }),
+
               OutlinedButton(
                   onPressed: () {
                     addUserToEmployeesCollection(selectedRole, _currentUser);

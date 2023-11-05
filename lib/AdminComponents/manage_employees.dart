@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:potential_potato/Models/employee_model.dart';
 import 'package:potential_potato/home.dart';
@@ -13,8 +14,14 @@ class ManageEmployeesComponent extends StatefulWidget {
 
 class _ManageEmployeesComponentState extends State<ManageEmployeesComponent> {
   late Employee _employee;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  late Stream<QuerySnapshot> _allRoles;
+
   @override
   void initState() {
+    _allRoles = FirebaseFirestore.instance
+        .collection('roles')
+        .snapshots(); //get all roles
     _employee = widget.employee;
     super.initState();
   }
