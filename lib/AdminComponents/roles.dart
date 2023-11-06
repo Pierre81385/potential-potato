@@ -22,6 +22,7 @@ class _RoleComponentState extends State<RoleComponent> {
   final _nameFocusNode = FocusNode();
   final _lvlTextController = TextEditingController();
   final _lvlFocusNode = FocusNode();
+  int _initalValue = 0;
 
   Future<void> addRole(String _name, int _lvl) async {
     String id = firestore.collection("roles").doc().id;
@@ -121,6 +122,88 @@ class _RoleComponentState extends State<RoleComponent> {
                       },
                       child: Text("Back")),
                 ),
+                // StreamBuilder<QuerySnapshot>(
+                //     stream: firestore.collection('roles').snapshots(),
+                //     builder: (context, snapshot) {
+                //       if (!snapshot.hasData)
+                //         return const Center(
+                //           child: const CircularProgressIndicator(),
+                //         );
+                //       return DropdownButton(
+                //           isExpanded: true,
+                //           value: null,
+                //           items: snapshot.data?.docs.map((doc) {
+                //             var role = doc.data() as Map<String, dynamic>;
+                //             var roleId = doc.id;
+                //             return DropdownMenuItem<String>(
+                //               value: roleId,
+                //               child: _showEdit == roleId
+                //                   ? Form(
+                //                       child: ListTile(
+                //                       leading: IconButton(
+                //                           onPressed: () {
+                //                             setState(() {
+                //                               _showEdit = "";
+                //                             });
+                //                           },
+                //                           icon: Icon(Icons.edit)),
+                //                       title: TextFormField(
+                //                         controller: _nameUpdateTextController,
+                //                         autocorrect: false,
+                //                         focusNode: _nameUpdateFocusNode,
+                //                         decoration: InputDecoration(
+                //                             hintText: role['name']),
+                //                       ),
+                //                       subtitle: TextFormField(
+                //                         controller: _lvlUpdateTextController,
+                //                         autocorrect: false,
+                //                         keyboardType: TextInputType.number,
+                //                         inputFormatters: <TextInputFormatter>[
+                //                           FilteringTextInputFormatter.digitsOnly
+                //                         ],
+                //                         focusNode: _lvlUpdateFocusNode,
+                //                         decoration: InputDecoration(
+                //                             hintText: role['lvl'].toString()),
+                //                       ),
+                //                       trailing: IconButton(
+                //                           onPressed: () {
+                //                             updateRole(
+                //                                 roleId,
+                //                                 _nameUpdateTextController.text,
+                //                                 int.parse(
+                //                                     _lvlTextController.text));
+                //                             setState(() {
+                //                               _nameUpdateTextController.text =
+                //                                   "";
+                //                               _lvlUpdateTextController.text =
+                //                                   "";
+                //                               _showEdit = "";
+                //                             });
+                //                           },
+                //                           icon: Icon(Icons.add_box_rounded)),
+                //                     ))
+                //                   : ListTile(
+                //                       leading: IconButton(
+                //                           onPressed: () {
+                //                             setState(() {
+                //                               _showEdit = roleId;
+                //                             });
+                //                           },
+                //                           icon: Icon(Icons.edit)),
+                //                       title: Text('${role['name']}'),
+                //                       subtitle: Text('Lvl: ${role['lvl']}'),
+                //                       trailing: IconButton(
+                //                           onPressed: () {
+                //                             deleteRole(roleId);
+                //                           },
+                //                           icon: Icon(Icons.delete)),
+                //                     ),
+                //             );
+                //           }).toList(),
+                //           onChanged: (value) {
+                //             setState(() {});
+                //           });
+                //     })
                 Expanded(
                   child: ListView.builder(
                     physics: const ScrollPhysics(),
@@ -158,8 +241,9 @@ class _RoleComponentState extends State<RoleComponent> {
                                       ],
                                       focusNode: _lvlUpdateFocusNode,
                                       decoration: InputDecoration(
-                                          hintText: snapshot.data?.docs[index]
-                                              ['lvl']),
+                                          hintText: snapshot
+                                              .data?.docs[index]['lvl']
+                                              .toString()),
                                     ),
                                     trailing: IconButton(
                                         onPressed: () {
@@ -188,7 +272,7 @@ class _RoleComponentState extends State<RoleComponent> {
                                     title: Text(
                                         '${snapshot.data?.docs[index]['name']}'),
                                     subtitle: Text(
-                                        'Lvl: ${snapshot.data?.docs[index]['lvl']}'),
+                                        'Lvl: ${snapshot.data?.docs[index]['lvl'].toString()}'),
                                     trailing: IconButton(
                                         onPressed: () {
                                           deleteRole(

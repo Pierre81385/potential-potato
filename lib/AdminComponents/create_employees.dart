@@ -16,24 +16,7 @@ class CreateEmployeeComponent extends StatefulWidget {
 class _CreateEmployeeComponentState extends State<CreateEmployeeComponent> {
   late User _currentUser;
 
-  final List<String> _employeeRole = [
-    "Owner",
-    "General Manager",
-    "BOH Manager",
-    "FOH Manager",
-    "Bar Manager",
-    "Bartender",
-    "Barback",
-    "Server",
-    "Food Runner",
-    "Head Chef",
-    "Chef",
-    "Prep COok",
-    "Dish",
-    "Training",
-    "none"
-  ];
-  String selectedRole = "none";
+  String selectedRole = "SELECT";
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   late Stream<QuerySnapshot> _allRoles;
 
@@ -83,63 +66,33 @@ class _CreateEmployeeComponentState extends State<CreateEmployeeComponent> {
               Text(_currentUser.phoneNumber != null
                   ? _currentUser.phoneNumber as String
                   : ""),
-              // DropdownButton<String>(
-              //   value: selectedRole,
-              //   onChanged: (newValue) {
-              //     setState(() {
-              //       selectedRole = newValue!;
-              //     });
-              //   },
-              //   items: _employeeRole.map((role) {
-              //     return DropdownMenuItem<String>(
-              //       value: role,
-              //       child: Text(role), // Display role name without enum prefix
-              //     );
-              //   }).toList(),
-              // ),
               StreamBuilder<QuerySnapshot>(
-                  stream: _allRoles,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return const Text('Something went wrong');
-                    }
-
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Text("Looking for roles!");
-                    }
-
-                    return Expanded(
-                      child: ListView.builder(
-                          physics: const ScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: snapshot.data?.docs.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return SingleChildScrollView(
-                              child: ListTile(
-                                title: Text(
-                                    '${snapshot.data?.docs[index]['name']}'),
-                                subtitle: Text(
-                                    'Lvl: ${snapshot.data?.docs[index]['lvl']}'),
-                                trailing: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        selectedRole =
-                                            snapshot.data!.docs[index].id;
-                                      });
-                                    },
-                                    icon: Icon(Icons.check,
-                                        color: selectedRole ==
-                                                snapshot.data!.docs[index].id
-                                            ? Colors.green
-                                            : Colors.black)),
-                              ),
-                            );
-                          }),
-                    );
+                  stream: firestore.collection('roles').snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData)
+                      return const Center(
+                        child: const CircularProgressIndicator(),
+                      );
+                    return DropdownButton(
+                        isExpanded: true,
+                        value: selectedRole,
+                        items: snapshot.data?.docs.map((doc) {
+                          var role = doc.data() as Map<String, dynamic>;
+                          var roleId = doc.id;
+                          return DropdownMenuItem<String>(
+                            value: roleId,
+                            child: ListTile(
+                              title: Text('${role['name']}'),
+                              trailing: Text('Lvl: ${role['lvl']}'),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedRole = value!;
+                          });
+                        });
                   }),
-
               OutlinedButton(
                   onPressed: () {
                     addUserToEmployeesCollection(selectedRole, _currentUser);
